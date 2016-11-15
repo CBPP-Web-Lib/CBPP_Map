@@ -162,7 +162,7 @@
 					labelFontSize: 28,
 					data: {},
 					dataIndex:0,
-
+					disabledHoverStates: {},
 					colorConfig: {
 						highColor:"#ffffff",
 						lowColor:"#000000",

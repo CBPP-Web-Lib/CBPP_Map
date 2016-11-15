@@ -369,7 +369,7 @@ CBPP.Map.mapcolors = function (colorConfig, m) {
                     m.stateObjs[state].attr("stroke", "#000000");
                     m.stateObjs[state].attr("stroke-width", 1);
                     
-
+                    
                     if (m.stateLabelObjs[state]) {
                         //If the color is dark, make the label white
                         if (brightness(c.stateColors[state]) >= m.brightnessThreshold || externalLabelStates[state]) {

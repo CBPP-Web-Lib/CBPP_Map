@@ -264,7 +264,7 @@ CBPP.Map.mapevents = function (m) {
         if (m.stateObjs[s][0] === null) {
             return false;
         }
-
+        
         var //coords,
             //prop,
             box_anchor,
@@ -290,6 +290,12 @@ CBPP.Map.mapevents = function (m) {
             //Unfocus the previously focused state
             if (m.focusedState !== "none") {
                 m.revertFocusColor(m.focusedState, 200);
+            }
+        }
+
+        if (typeof(m.disabledHoverStates[s])!=="undefined") {
+            if (m.disabledHoverStates[s]===1) {
+                return false;
             }
         }
 
