@@ -159,7 +159,7 @@
 					labelsToHide: function () {
 						return false;
 					},
-					
+					labelFontSize: 28,
 					data: {},
 					dataIndex:0,
 
@@ -183,7 +183,6 @@
 					viewY: 627,
 					popupStyle: {
 						padding: 10,
-						fontSize: 28,
 						bgColor: "#eee"
 					}
 					
@@ -346,7 +345,7 @@
 						if (typeof (m.stateLabelObjs) === "undefined") { m.stateLabelObjs = {}; }
 						m.stateLabelObjs[state] = m.paper.text(coords[0], coords[1], state);
 						m.stateLabelObjs[state].attr({
-							"font-size": 28,
+							"font-size": m.labelFontSize,
 							"font-family": m.fontFamily
 						});
 
