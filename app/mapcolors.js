@@ -14,7 +14,7 @@ CBPP.Map.mapcolors = function (colorConfig, m) {
         c.colorConfig = colorConfig;
     };
 
-    var colorOptions = ["highColor", "lowColor", "zeroColor", "highlightColor"];
+    var colorOptions = ["highColor", "lowColor", "zeroColor", "highlightColor","noDataColor"];
 
     for (var i = 0, ii = colorOptions.length; i<ii; i++) {
         if (typeof(m.colorConfig[colorOptions[i]])==="undefined") {

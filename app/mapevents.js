@@ -348,6 +348,10 @@ CBPP.Map.mapevents = function (m) {
                 }
             }
         }
+
+        if (typeof(m.stateFocus)==="function") {
+            m.stateFocus(s);
+        }
         if (m.disableAllPopups === true) {
             return false;
         }
@@ -364,7 +368,10 @@ CBPP.Map.mapevents = function (m) {
         });
         popup_container.data("state", s);
         popup = $("<div class='popup'>");
-        w = 190 * m.textTransform;
+        if (typeof(m.popupStyle.width)==="undefined") {
+            m.popupStyle.width = 190;
+        }
+        w = m.popupStyle.width * m.textTransform;
         popup.css({
             "width": w,
             "position": "absolute",

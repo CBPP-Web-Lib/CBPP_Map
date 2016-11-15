@@ -208,7 +208,7 @@
 				m.fontFamily = $(m.mapSelector).css("font-family");
 				
 				/*create the main Raphael canvas*/
-
+				$(m.mapSelector).html("");
 				m.paper = new Raphael($(m.mapSelector)[0], m.width, m.height);
 				/*scale the canvas to accomodate the path coordinate system*/
 				var top = 0;
@@ -456,29 +456,6 @@
 							delete m[l[i]];
 						}
 					};
-					/*m.setNewColors = function (cObj) {
-						var obj = {};
-						for (var p in cObj) {
-							if (cObj.hasOwnProperty(p)) {
-								obj[p] = cObj[p];
-							}
-						}
-						if (typeof(obj.zeroColor) === "undefined") {
-							obj.zeroColor = "#ffffff";
-						}
-						m.colors.colorConfig = obj;
-					};*/
-					
-					/*m.setCustomMin = function (theMin) {
-						m.min = theMin;
-						m.colors.customMin = theMin;
-					};
-
-					m.setCustomMax = function (theMax) {
-						m.max = theMax;
-						m.colors.customMax = theMax;
-					};*/
-
 					m.makeLegend = function () {
 						if (typeof (m.zoomedState) === "string") {
 							return false;
