@@ -173,7 +173,6 @@ CBPP.Map.legend = function () {
 				"text-anchor": "start"
 			};
 
-		
 			if (typeof (m.colorBins) !== "undefined") {
 				drawBins(m, left, width, legendAttrs);
 			} else {

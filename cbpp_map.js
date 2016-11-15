@@ -86,8 +86,7 @@
 	})();
 
 	CBPP.Map.load = function (callback) {
-		var required_scripts = ["app/us_paths.js", "app/mapevents.js", "app/mapcolors.js", "app/legend.js", "app/statenames.js","app/raphael.min.js"];
-		var scripts_requested = 0;
+		var scripts_requested = 6;
 		var allScriptsLoaded = false;
 		var load_function = function () {
 			scripts_requested--;
@@ -96,32 +95,31 @@
 				ready();
 			}
 		};
-		var urlRoot = CBPP.urlBase + "CBPP_Map/v" + CBPP.Map.version + "/";
-		if (urlRoot === null) {
-			urlRoot = "";
+		/*special variable for compilation purposes, hence all caps*/
+		var CBPP_URL_ROOT = CBPP.urlBase + "CBPP_Map/v" + CBPP.Map.version + "/";
+		if (CBPP_URL_ROOT === null) {
+			CBPP_URL_ROOT = "";
 		}
 		
-		for (var i = 0, ii = required_scripts.length; i < ii; i++) {
-			$.getScript(urlRoot + required_scripts[i], load_function);
-			scripts_requested++;
-		}
+		CBPP.JS(CBPP_URL_ROOT + "app/us_paths.js", load_function);
+		CBPP.JS(CBPP_URL_ROOT + "app/mapevents.js", load_function);
+		CBPP.JS(CBPP_URL_ROOT + "app/mapcolors.js", load_function);
+		CBPP.JS(CBPP_URL_ROOT + "app/legend.js", load_function);
+		CBPP.JS(CBPP_URL_ROOT + "app/statenames.js", load_function);
+		CBPP.JS(CBPP_URL_ROOT + "raphael.min.js", load_function);
+		
+
 		var cssLoaded = false;
 		var mapIsBuilt = false;
 		
-		var l = document.createElement("link");
-		l.type="text/css";
-		l.href= urlRoot + "cbpp_map.css";
-		l.rel = "stylesheet";
-		document.getElementsByTagName("head")[0].appendChild(l);
-		
+		CBPP.CSS(CBPP_URL_ROOT + "cbpp_map.css", cssLoad);
 		
 		function cssLoad() {
 			cssLoaded = true;
 			ready();
 		}
 		
-		l.onload = cssLoad;
-		l.load = cssLoad;
+		
 		
 		function ready() {
 			if (cssLoaded && allScriptsLoaded && !mapIsBuilt) {
@@ -141,7 +139,6 @@
 			var mapEvents = CBPP.Map.mapevents;
 			var MapColors = CBPP.Map.mapcolors;
 			var legend = new CBPP.Map.legend();
-			
 			//create the main map object
 			CBPP.Map.Map = function (id, ops) {
 				var m = this; //store a short reference to main object for easy use
