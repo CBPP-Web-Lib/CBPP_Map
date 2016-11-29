@@ -417,6 +417,11 @@ CBPP.Map.mapcolors = function (colorConfig, m) {
                 if (i >= ii - 1) {
                     outstandingStates = false;
                 }
+                if (typeof(m.animationRefs[state])!=="undefined") {
+                    if (typeof(m.animationRefs[state].stopAnimation)==="function") {
+                        m.animationRefs[state].stopAnimation();
+                    }
+                }
                 m.animationRefs[state] = c.animateStateColor(state, toAnimate[i][1], duration, onFinishStateAnimation);
                 
             }
