@@ -1,0 +1,17 @@
+{
+  "name": "cbpp_map",
+  "version": "0.8.0",
+  "description": "Wrapper for CBPP Maps",
+  "main": "cbpp_map.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Nick Kasprak",
+  "license": "ISC",
+  "devDependencies": {
+    "browserify-css": "^0.14.0"
+  },
+  "dependencies": {
+    "d3": "^4.12.0"
+  }
+}

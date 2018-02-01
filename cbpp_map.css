@@ -13,10 +13,19 @@
 	margin:auto;	
 }
 
+.cbpp_map .popup_container {
+	overflow:visible;
+	width:0px;
+	height:0px;
+}
+
 .cbpp_map .popup {
-    border:1px solid #000;
+    border:1px solid #ddd;
 	box-sizing:content-box;
 	z-index:10;
+	padding:0.5em;
+	background-color:#fff;
+	position:absolute;
 }
 
 .cbpp_map .popup ul{

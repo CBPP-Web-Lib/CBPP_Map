@@ -1,6 +1,7 @@
-/*globals CBPP*/
-CBPP.Map.legend = function () {
+/*globals module*/
+module.exports = function ($, d3) {
 	"use strict";
+
 	/*If the legend goes through zero, get the percentage horizontal position of zero*/
 	function getZeroLocation(l) {
 		var spansZero = (l.lowValue < 0 && l.highValue > 0), zeroPercent;
@@ -13,17 +14,29 @@ CBPP.Map.legend = function () {
 	}
 
 	/*Make the SVG gradient string*/
-	function makeGradientString(l) {
+	function makeGradientData(l) {
 		var gradientString,
 			zeroPercent;
-		gradientString = "0-" + l.lowColor + "-";
+		var r = [];
+		r.push({
+			color: l.lowColor,
+			offset: 0
+		});
+		//gradientString = "0-" + l.lowColor + "-";
 		zeroPercent = getZeroLocation(l);
 		if (zeroPercent !== "noZero") {
-			gradientString += l.middleColor + ":" + zeroPercent + "-";
+			r.push({
+				color: l.middleColor,
+				offset: zeroPercent
+			});
+			//gradientString += l.middleColor + ":" + zeroPercent + "-";
 			l.middleTextPos = zeroPercent;
 		}
-		gradientString += l.highColor;
-		return gradientString;
+		r.push({
+			color: l.highColor,
+			offset: 1
+		});
+		return r;
 	}
 
 	function legendLocation(m) {
@@ -37,36 +50,74 @@ CBPP.Map.legend = function () {
 		return legendPosition;
 	}
 
+	function applyLegendAttrs(obj, attr) {
+		for (var key in attr) {
+			if (attr.hasOwnProperty(key)) {
+				obj.attr(key, attr[key]);
+			}
+		}
+	}
+
 	function drawGradient(m, left, width, l, legendAttrs) {
 		var zeroPercent;
 		var _legendLocation = legendLocation(m);
-		m.legendBox = m.paper.rect(left, legendLocation(m), width, 20);
-
+		m.legendBox = m.paper.append("rect")
+			.attr("x",left)
+			.attr("y", legendLocation(m))
+			.attr("width", width)
+			.attr("height", 20);
 		//Fill with gradient string
-		m.legendBox.attr("fill", makeGradientString(l));
+		m.paper.select("#legendGradient").remove();
+		m.paper.append("linearGradient")
+			.attr("id","legendGradient")
+			.selectAll("stop")
+			.data(makeGradientData(l))
+			.enter()
+			.append("stop")
+			.attr("offset", function(d) {return d.offset;})
+			.attr("stop-color", function(d) {return d.color;});
 
+
+
+		//m.legendBox.attr("fill", makeGradientString(l));
+		m.legendBox.attr("stroke", m.colorConfig.borderColor);
+		m.legendBox.attr("stroke-width", m.borderWidth);
+		m.legendBox.attr("fill","url(#legendGradient)");
 		//Make new left legend label
-		m.leftLegendText = m.paper.text(left, _legendLocation + 35, l.formatter(l.lowValue));
+		m.leftLegendText = m.paper.append("text")
+			.attr("x",left)
+			.attr("y", _legendLocation + 35)
+			.attr("dy", legendAttrs["font-size"]/3)
+			.text(l.formatter(l.lowValue));
+		applyLegendAttrs(m.leftLegendText, legendAttrs);
 		m.leftLegendText.attr(legendAttrs);
-
 		//The rest of l is pretty much the same for the other labels
-		m.rightLegendText = m.paper.text(left + width, _legendLocation + 35, l.formatter(l.highValue));
+		m.rightLegendText = m.paper.append("text")
+			.attr("x",left + width)
+			.attr("y", _legendLocation + 35)
+			.attr("dy", legendAttrs["font-size"]/3)
+			.text(l.formatter(l.highValue));
 		legendAttrs["text-anchor"] = "end";
-		m.rightLegendText.attr(legendAttrs);
+		applyLegendAttrs(m.rightLegendText, legendAttrs);
 
 		zeroPercent = getZeroLocation(l);
 		if (zeroPercent !== "noZero") {
-			m.middleLegendText = m.paper.text(left + width * zeroPercent / 100, _legendLocation + 35, l.formatter(0));
+			m.middleLegendText = m.paper.attr("x",left + width * zeroPercent / 100)
+				.attr("y", _legendLocation + 35)
+				.attr("dy", legendAttrs["font-size"]/3)
+				.text(l.formatter(0));
 			legendAttrs["text-anchor"] = "middle";
-			m.middleLegendText.attr(legendAttrs);
+			applyLegendAttrs(m.middleLegendText, legendAttrs);
 		}
 	}
 
 
 	function drawBins(m, left, width, legendAttrs) {
 		m.legendBins = [];
-		legendAttrs["font-size"] = 26;
-		
+		if (typeof(legendAttrs["font-size"])==="undefined") {
+			legendAttrs["font-size"] = 26;
+		}
+
 		/*adjust legend line height in super hacky way*/
 		var adjust = 0,
 			adjuster = function() {
@@ -74,26 +125,38 @@ CBPP.Map.legend = function () {
 			adjust += 8;
 			$(this).attr("dy", dy);
 		};
-		
-		/*http://stackoverflow.com/questions/2124763/raphael-js-and-text-positioning*/
-		function alignTop(t) {
-			var b = t.getBBox();
-			var h = Math.abs(b.y2 - b.y) + 1;
 
-			t.attr({
-				'y': b.y + h
-			});
-		}
-		
 		var _legendLocation = legendLocation(m);
-
-		for (var i = 0, ii = m.colorBins.length; i < ii; i++) {
+		var binsToDraw = [], includeBin;
+		for (var i = 0, ii = m.colorBins.length; i<ii; i++) {
+			includeBin = true;
+			if (typeof(m.colorBins[i].hideFromLegend)!=="undefined") {
+				if (m.colorBins[i].hideFromLegend === true) {
+					includeBin = false;
+				}
+			}
+			if (includeBin) {
+				binsToDraw.push(m.colorBins[i]);
+			}
+		}
+		for (i = 0, ii = binsToDraw.length; i < ii; i++) {
 			m.legendBins[i] = {};
-			m.legendBins[i].box = m.paper.rect(left + (i / ii) * width, _legendLocation + 10, 20, 20);
-			m.legendBins[i].box.attr("fill", m.colorBins[i].color);
-			m.legendBins[i].label = m.paper.text(left + (i / ii) * width + 23, _legendLocation + 4, m.colorBins[i].customLabel);
-			m.legendBins[i].label.attr(legendAttrs);
-			alignTop(m.legendBins[i].label);
+			var box_size = Math.round(legendAttrs["font-size"]*0.8);
+			m.legendBins[i].box = m.paper.append("rect")
+				.attr("x",left + (i / ii) * width)
+				.attr("y", _legendLocation + box_size*0.5)
+				.attr("height", box_size)
+				.attr("width", box_size);
+			m.legendBins[i].box.attr("fill", binsToDraw[i].color);
+			m.legendBins[i].box.attr("stroke", m.colorConfig.borderColor);
+			m.legendBins[i].box.attr("stroke-width", m.borderWidth);
+			m.legendBins[i].label = m.paper.append("text")
+				.attr("x",left + (i / ii) * width + box_size+2)
+				.attr("y", _legendLocation + box_size+2)
+				.attr("dy", legendAttrs["font-size"]/3)
+				.text(binsToDraw[i].customLabel);
+			applyLegendAttrs(m.legendBins[i].label, legendAttrs);
+			//alignTop(m.legendBins[i].label);
 			$(m.legendBins[i].label[0]).children("tspan").each(adjuster);
 			adjust = 0;
 		}
@@ -168,7 +231,7 @@ CBPP.Map.legend = function () {
 			deleteLegendBins(m);
 
 			var legendAttrs = {
-				"font-size": 28,
+				"font-size": m.legendLabelSize,
 				"font-family": m.fontFamily,
 				"text-anchor": "start"
 			};
