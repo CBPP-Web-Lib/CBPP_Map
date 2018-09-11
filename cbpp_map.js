@@ -232,6 +232,9 @@ module.exports = function($, d3) {
 
 
 		$(window).on("resize", function() {
+			if ($(m.mapSelector).width()===0) {
+				return;
+			}
 			var svg = $(m.mapSelector + " svg"),
 			aspectRatio = svg.height()/svg.width();
 			var containerWidth = $(m.mapSelector).width();
