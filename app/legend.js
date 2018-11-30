@@ -128,6 +128,8 @@ module.exports = function ($, d3) {
 
 		var _legendLocation = legendLocation(m);
 		var binsToDraw = [], includeBin;
+		var remainingWidth = 1;
+		var widthlessBins = 0;
 		for (var i = 0, ii = m.colorBins.length; i<ii; i++) {
 			includeBin = true;
 			if (typeof(m.colorBins[i].hideFromLegend)!=="undefined") {
@@ -137,13 +139,27 @@ module.exports = function ($, d3) {
 			}
 			if (includeBin) {
 				binsToDraw.push(m.colorBins[i]);
+				if (typeof(m.colorBins[i].customWidth)!=="undefined") {
+					remainingWidth -= m.colorBins[i].customWidth;
+				} else {
+					widthlessBins++;
+				}
 			}
 		}
+		for (i = 0, ii = binsToDraw.length; i<ii; i++) {
+			if (typeof(binsToDraw[i].customWidth)==="undefined") {
+				binsToDraw[i].customWidth = remainingWidth/widthlessBins;
+			}
+		}
+		var accLeft = left;
 		for (i = 0, ii = binsToDraw.length; i < ii; i++) {
 			m.legendBins[i] = {};
 			var box_size = Math.round(legendAttrs["font-size"]*0.8);
-			m.legendBins[i].box = m.paper.append("rect")
-				.attr("x",left + (i / ii) * width)
+			m.legendBins[i].box = m.paper.append("rect");
+			if (i>0) {
+				accLeft += binsToDraw[i-1].customWidth * width;
+			}
+			m.legendBins[i].box.attr("x",accLeft)
 				.attr("y", _legendLocation + box_size*0.5)
 				.attr("height", box_size)
 				.attr("width", box_size);
@@ -151,7 +167,7 @@ module.exports = function ($, d3) {
 			m.legendBins[i].box.attr("stroke", m.colorConfig.borderColor);
 			m.legendBins[i].box.attr("stroke-width", m.borderWidth);
 			m.legendBins[i].label = m.paper.append("text")
-				.attr("x",left + (i / ii) * width + box_size+2)
+				.attr("x",accLeft + box_size+2)
 				.attr("y", _legendLocation + box_size+2)
 				.attr("dy", legendAttrs["font-size"]/3)
 				.text(binsToDraw[i].customLabel);
