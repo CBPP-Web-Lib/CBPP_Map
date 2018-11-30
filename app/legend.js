@@ -204,8 +204,16 @@ module.exports = function ($, d3) {
 
 		/*Draw the legend*/
 		draw: function (m) {
-			var left = m.viewX * 0.15, //goes from 15% to 85%
-				width = m.viewX * 0.7;
+
+			var legendWidth = 0.7;
+			if (typeof(m.legendWidth)!=="undefined") {
+				legendWidth = m.legendWidth;
+			}
+
+			var leftPercent = (1 - legendWidth)/2;
+
+			var left = m.viewX * leftPercent, //goes from 15% to 85%
+				width = m.viewX * legendWidth;
 
 			//Delete existing legend
 			if (m.legendBox) {
