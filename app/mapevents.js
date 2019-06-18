@@ -474,6 +474,7 @@ module.exports = function (m, $, d3) {
         }
     };
     m.applyHoverEvents();
+    m.fadeoutPopup = doFadeoutPopup;
     /*$(m.mapSelector).on("click touchstart"," .popup", function() {
         var state = $(this).parents(".popup_container").attr("id").split("_")[1];
         m.stateClick(state);
