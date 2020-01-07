@@ -216,17 +216,23 @@ module.exports = (function() {
             /*wrapper for calcColor function that accounts for bins*/
             stateColor = function (cScale, bins) {
                 var NAindex = -1;
+                var s = cScale.scale;
+                if (cScale.sign==="-") {
+                    s*=-1;
+                }
                 for (var i = 0, ii = bins.length; i < ii; i++) {
                     if (bins[i].type === "NA") { NAindex = i; }
-                    if (cScale.sign==="+"){
-                        if (cScale.scale >= bins[i].min.scale && cScale.scale < bins[i].max.scale) {
-                            return bins[i].color;
-                        }
-                    } else {
-                        if (cScale.scale >= bins[i].max.scale && cScale.scale < bins[i].min.scale) {
-                            return bins[i].color;
-                        }
+                    var mins = 1, maxs = 1;
+                    if (bins[i].min.sign==="-") {
+                        mins = -1;
                     }
+                    if (bins[i].max.sign==="-") {
+                        maxs = -1;
+                    }
+                    if (s>= bins[i].min.scale*mins && s < bins[i].max.scale*maxs) {
+                        return bins[i].color;
+                    }
+                    
                 }
                 if (NAindex !== -1) {
                     return bins[NAindex].color;
