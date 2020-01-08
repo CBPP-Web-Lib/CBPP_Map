@@ -180,62 +180,16 @@ module.exports = function (m, $, d3) {
         m.textTransform = Math.min(1, m.width / m.fullScaleWidth);
     };
     m.calcTextTransform();
-    m.setMapOpacity = function (opacity, exceptEls) {
-        function o(obj, op) {
-            if (typeof (obj) !== "undefined") {
-                if (obj.node !== null) {
-                    obj.attr({
-                        "fill-opacity": op,
-                        "stroke-opacity": op
-                    });
-                    if (op === 0) {
-                        obj.hide();
-                    } else {
-
-                        if (obj.node.style.display === "none") {
-                            obj.show();
-                        }
-                    }
-                }
-            }
+    m.zoomFrame = function() {
+        if (m.zooming) {
+            var currentVB = m.paper.attr("viewBox").split(" ");
+            var scale = currentVB[2]/m.viewX;
+            m.paper.selectAll("path")
+                .attr("stroke-width", function() {
+                    return d3.select(this).attr("data-org-stroke-width")*scale;
+                });
+            window.requestAnimationFrame(m.zoomFrame);
         }
-        var exceptElOs = [];
-        for (var i = 0, ii = exceptEls.length; i < ii; i++) {
-            exceptElOs[i] = exceptEls[i].attr("opacity");
-        }
-        for (var otherState in m.stateObjs) {
-            if (m.stateObjs.hasOwnProperty(otherState)) {
-                o(m.stateObjs[otherState], opacity);
-            }
-        }
-        for (var label in m.stateLabelObjs) {
-            if (m.stateLabelObjs.hasOwnProperty(label)) {
-                o(m.stateLabelObjs[label], opacity);
-            }
-        }
-        for (var line in m.maplines) {
-            if (m.maplines.hasOwnProperty(line)) {
-                for (var j = 0, jj = m.maplines[line].length; j < jj; j++) {
-                    o(m.maplines[line][j], opacity);
-                }
-            }
-        }
-
-        m.legendBox.attr("fill", "#fff");
-        o(m.legendBox, opacity);
-        o(m.leftLegendText, opacity);
-        o(m.middleLegendText, opacity);
-        o(m.rightLegendText, opacity);
-        for (i = 0, ii = exceptEls.length; i < ii; i++) {
-            o(exceptEls[i], exceptElOs[i]);
-        }
-    };
-    m.zoomFrame = function () {
-        var scale, opacity, state = m.stateObjs[m.zoomedState], p = m.zoomAnimation.progress;
-        scale = Math.round((p * 1.5 + 1) * 100) / 100;
-        opacity = Math.round((1 - p) * 100) / 100;
-        state.transform("s" + scale + "T" + Math.round(p * m.zoomedStateTranslation.x) + "," + Math.round(p * m.zoomedStateTranslation.y));
-        m.setMapOpacity(opacity, [state]);
     };
     m.zoomOut = function (onComplete) {
         if (m.zooming) {
@@ -246,31 +200,34 @@ module.exports = function (m, $, d3) {
         }
         m.zoomOutStart();
         m.zooming = true;
-        m.zoomAninimation = {};
-        m.zoomAnimation.progress = 1;
-
-        m.zoomAnimation.interval = setInterval(function () {
-            m.zoomAnimation.progress -= 0.2;
-            if (m.zoomAnimation.progress <= 0) {
-                m.zoomAnimation.progress = 0;
-            }
+        m.paper.transition()
+            .duration(m.zoomDuration)
+            .attr("viewBox", [0, 0, m.viewX, m.viewY].join(" "))
+            //.attr("width","100%")
+            .on("end", function() {
             m.zoomFrame();
-            if (m.zoomAnimation.progress === 0) {
-                clearInterval(m.zoomAnimation.interval);
                 m.zoomedState = null;
                 m.zooming = false;
                 m.makeLegend();
                 if (typeof (onComplete) === "function") {
-                    onComplete();
+                    onComplete();   
                 }
-            }
-        },40);
+                if (typeof(m.onZoomOutDone)==="function") {
+                    m.onZoomOutDone();
+                }
+            });
+        m.paper.selectAll("path, text")
+            .transition()
+            .duration(m.zoomDuration)
+            .attr("opacity",1);
+        m.zoomFrame();
     };
-    m.zoomToState = function (s) {
+    m.zoomToState = function (s, cb) {
         /*check if alreayd zoomed into state*/
         if (m.isCanvasSupported === false) {
             return false;
         }
+        m.popup_container.hide(); 
         if (m.zoomedState) {
             if (m.zoomedState === s) {
                 return false;
@@ -284,25 +241,34 @@ module.exports = function (m, $, d3) {
         }
         m.zoomedState = s;
         m.zooming = true;
-        var bbox = m.stateObjs[s].getBBox();
-        m.zoomedStateTranslation = {
-            x: 0 - (bbox.x - bbox.width * 0.75) + 0.5 * m.width / m.scaleFactor - 0.5 * bbox.width * 2.5,
-            y: 0 - (bbox.y - bbox.height * 0.75) + 0.5 * m.height / m.scaleFactor - 0.5 * bbox.height * 2.5
-        };
-        m.zoomAnimation = {};
-        m.zoomAnimation.progress = 0;
-        m.zoomAnimation.interval = setInterval(function () {
-            m.zoomAnimation.progress += 0.2;
-            if (m.zoomAnimation.progress >= 1) {
-                m.zoomAnimation.progress = 1;
-            }
-            m.zoomFrame();
-            if (m.zoomAnimation.progress === 1) {
-                clearInterval(m.zoomAnimation.interval);
+        var bbox = m.stateObjs[s].node().getBBox();
+        m.stateObjs[s].attr("opacity",1);
+        m.paper.selectAll("path")
+            .attr("data-org-stroke-width", function() {
+                return d3.select(this).attr("stroke-width");
+            });
+        var viewbox_additional = $(window).width() < m.mobileThreshold ? 1 : 3;
+        m.paper.transition()
+            .duration(m.zoomDuration)
+            .attr("viewBox", [bbox.x - bbox.width*0.2, bbox.y - bbox.height*0.2, bbox.width*(viewbox_additional + 0.4), bbox.height*1.4].join(" "))
+            //.attr("width",map_width)
+            .on("end", function() {
+                m.zoomFrame();
                 m.zooming = false;
-            }
-        }, 40);
+                if (typeof(cb)==="function") {
+                    cb();
+                }
+            });
+        m.paper.selectAll("path, text").filter(function() {
+            return this != m.stateObjs[m.zoomedState].node();
+        }).attr("opacity",1)
+            .transition()
+            .duration(m.zoomDuration)
+            .attr("opacity",0);
+        m.zoomFrame();
     };
+
+    
 
     m.stateToFocusColor = function(s) {
         m.animationRefs[s] = m.colors.animateStateColor(s, m.colors.colorConfig.hoverColor, 200);
@@ -367,9 +333,7 @@ module.exports = function (m, $, d3) {
         if (typeof(m.stateFocus)==="function") {
             m.stateFocus(s);
         }
-
-        if (m.disableAllPopups !== true && !popupDisabled) {
-
+        if (m.disableAllPopups !== true && !popupDisabled && !m.zoomedState) {
             //Create a new popup
             var popup_container = m.popup_container;
             popup_container.data("state", s);

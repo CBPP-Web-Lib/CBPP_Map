@@ -124,6 +124,8 @@ module.exports = function($, d3) {
 			hideGU: true,
 			hideVI: true,
 			borderWidth: 0.5,
+			mobileThreshold:750,
+			zoomDuration:200,
 			labelDarkColor: "#666",
 			labelLightColor: "#fff",
 			legendLabelSize:24,
@@ -192,7 +194,7 @@ module.exports = function($, d3) {
 			.attr("width",m.width)
 			.attr("height",m.height)
 			.attr("viewBox", "0 " + top + " " + m.viewX + " " + m.viewY)
-			.attr("preserveAspectRatio","xMinYMin");
+			.attr("preserveAspectRatio","xMidYMid");
 
 
 		//m.paper.setViewBox(0, top, m.viewX, m.viewY);
