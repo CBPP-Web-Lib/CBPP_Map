@@ -141,7 +141,7 @@ module.exports = function (m, $, d3) {
     //The user can pass in a click callback which gets run here.
     m.mouseClick = function () {
         var state = d3.select(this).attr("id").split("_")[1];
-        m.stateClick(state);
+        m.stateClick(state, m);
     };
 
     //Here too.
