@@ -198,6 +198,9 @@ module.exports = function (m, $, d3) {
         if (typeof (m.zoomedState) !== "string") {
             return false;
         }
+        if (typeof(m.beforeZoom)==="function") {
+            m.beforeZoom();
+        }
         m.zoomOutStart();
         m.zooming = true;
         m.paper.transition()
