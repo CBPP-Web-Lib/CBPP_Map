@@ -245,6 +245,23 @@ module.exports = function (m, $, d3) {
         m.zoomedState = s;
         m.zooming = true;
         var bbox = m.stateObjs[s].node().getBBox();
+
+        if (s==="DC") {
+            bbox = {
+                x:830,
+                y:400,
+                width:70,
+                height:70
+            }
+        }
+        if (s==="US") {
+            bbox = {
+                x:0,
+                y:0,
+                width:940,
+                height:627
+            }
+        }
         m.stateObjs[s].attr("opacity",1);
         m.paper.selectAll("path")
             .attr("data-org-stroke-width", function() {
@@ -263,7 +280,7 @@ module.exports = function (m, $, d3) {
                 }
             });
         m.paper.selectAll("path, text").filter(function() {
-            return this != m.stateObjs[m.zoomedState].node();
+            return (this != m.stateObjs[m.zoomedState].node()) && m.zoomedState!=="US";
         }).attr("opacity",1)
             .transition()
             .duration(m.zoomDuration)
