@@ -190,7 +190,8 @@ module.exports = (function() {
                 "ID": [0, 36],
                 "US": [32, 0],
                 "GU": [32, 0],
-                "VI": [32, 0]
+                "VI": [32, 0],
+                "SC": [5, -5]
 
             },
             absOffset: {
