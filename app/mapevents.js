@@ -364,7 +364,7 @@ module.exports = function (m, $, d3) {
             var w = m.popupWidth * $(m.mapSelector).width();
             if (typeof(m.popupWidthFixed)!=="undefined") {
               if (m.popupWidthFixed) {
-                w = m.popupWidth;
+                w = m.popupWidthFixed;
               }
             }
             popup.css({
