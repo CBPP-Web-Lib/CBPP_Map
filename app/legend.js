@@ -178,6 +178,33 @@ module.exports = function ($, d3) {
 		}
 	}
 
+	function replace_gradient(m) {
+		if (m.colorGen) {
+			var rect = d3.select(m.mapSelector + " svg").selectAll('rect[fill="url(#legendGradient)"]');
+			var canvas = $(document.createElement("canvas")).attr("width",500).attr("height",1);
+			var ctx = canvas[0].getContext("2d");
+			var start = m.colorConfig.lowColor;
+			var end =  m.colorConfig.highColor;
+			var easing = function(x) {return x;}
+			if (typeof(m.colorEasing)==="function") {
+				easing = m.colorEasing;
+			}
+			for (var x = 0; x < 500; x++) {
+			var p = x/500;
+			ctx.fillStyle = "rgb(" + m.colorGen(p, start, end, easing).join(",") + ")";
+			ctx.fillRect(x, 0, 1, 10);
+			}
+			var bbox = rect.node().getBBox();
+			var viewBox = d3.select(m.mapSelector + " svg").attr("viewBox").split(" ");
+			canvas.css("left", 100*(bbox.x - viewBox[0])/viewBox[2] + "%");
+			canvas.css("top", 100*(bbox.y - viewBox[1])/viewBox[3] + "%");
+			canvas.css("width", 100*bbox.width/viewBox[2] + "%");
+			canvas.css("height", 100*bbox.height/viewBox[3] + "%");
+			canvas.css("position","absolute");
+			$(m.mapSelector).parent().append(canvas);
+		}
+	}
+
 	function deleteLegendBins(m) {
 		if (typeof (m.legendBins) !== "undefined") {
 			for (var i = 0, ii = m.legendBins.length; i < ii; i++) {
@@ -264,6 +291,7 @@ module.exports = function ($, d3) {
 				drawBins(m, left, width, legendAttrs);
 			} else {
 				drawGradient(m, left, width, this, legendAttrs);
+				replace_gradient(m);
 			}
 		}
 	};

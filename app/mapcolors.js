@@ -162,21 +162,30 @@ module.exports = (function() {
                 }
                 /*Fit to bounds*/
                 cScale = Math.max(0, Math.min(1, cScale));
-                for (i = 0; i < 3; i += 1) {
-                    if (spansZero) {
-
-                        if (cScaleObj.sign === "-") {
-                            /*convert it back to a normal 0 to 1 range and calc color*/
-                            rgbVal = cScale * (lowRGB[i] - zeroRGB[i]) + zeroRGB[i];
-                        } else {
-                            rgbVal = cScale * (highRGB[i] - zeroRGB[i]) + zeroRGB[i];
-                        }
-                    } else {
-                        rgbVal = Math.max(0, Math.min(cScale)) * (highRGB[i] - lowRGB[i]) + lowRGB[i];
+                if (m.colorGen) {
+                    var easing = function(x) {return x;}
+                    if (m.colorEasing) {
+                        easing = m.colorEasing;
                     }
-                    rgb[i] = Math.round(rgbVal);
+                    var rgb = m.colorGen(cScale, c.colorConfig.lowColor, c.colorConfig.highColor, easing);
+                    return c.RGBToHex(rgb);
+                } else {
+                    for (i = 0; i < 3; i += 1) {
+                        if (spansZero) {
+
+                            if (cScaleObj.sign === "-") {
+                                /*convert it back to a normal 0 to 1 range and calc color*/
+                                rgbVal = cScale * (lowRGB[i] - zeroRGB[i]) + zeroRGB[i];
+                            } else {
+                                rgbVal = cScale * (highRGB[i] - zeroRGB[i]) + zeroRGB[i];
+                            }
+                        } else {
+                            rgbVal = Math.max(0, Math.min(cScale)) * (highRGB[i] - lowRGB[i]) + lowRGB[i];
+                        }
+                        rgb[i] = Math.round(rgbVal);
+                    }
+                    return c.RGBToHex(rgb);
                 }
-                return c.RGBToHex(rgb);
             };
 
             spansZero = (m.min < 0 && m.max > 0);
