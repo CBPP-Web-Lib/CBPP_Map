@@ -180,8 +180,9 @@ module.exports = function ($, d3) {
 
 	function replace_gradient(m) {
 		if (m.colorGen) {
+			$(m.mapSelector).parent().find(".replace-canvas").remove();
 			var rect = d3.select(m.mapSelector + " svg").selectAll('rect[fill="url(#legendGradient)"]');
-			var canvas = $(document.createElement("canvas")).attr("width",500).attr("height",1);
+			var canvas = $(document.createElement("canvas")).attr("width",500).attr("height",1).addClass("replace-canvas");
 			var ctx = canvas[0].getContext("2d");
 			var start = m.colorConfig.lowColor;
 			var end =  m.colorConfig.highColor;
@@ -201,6 +202,7 @@ module.exports = function ($, d3) {
 			canvas.css("width", 100*bbox.width/viewBox[2] + "%");
 			canvas.css("height", 100*bbox.height/viewBox[3] + "%");
 			canvas.css("position","absolute");
+			rect.remove();
 			$(m.mapSelector).parent().append(canvas);
 		}
 	}
