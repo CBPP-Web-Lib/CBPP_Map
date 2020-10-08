@@ -135,7 +135,7 @@ module.exports = function (m, $, d3) {
             return false;
         }
         m.focusedState = null;
-        m.revertFocusColor(s, 100);
+        m.revertFocusColor(s, 100, m.afterFocusRemoved);
     };
 
     //The user can pass in a click callback which gets run here.
@@ -151,7 +151,7 @@ module.exports = function (m, $, d3) {
     };
 
     //Method to return the state to its original color after it's been unfocused
-    m.revertFocusColor = function (s, duration) {
+    m.revertFocusColor = function (s, duration, cb) {
         /*This is an object to keep track of any animations that are running
         and I can't think of any particular reason why it wouldn't already exist
         at this point in the code, but may as well check*/
@@ -165,7 +165,7 @@ module.exports = function (m, $, d3) {
         }
 
         /*Start a new animation back to the original color*/
-        m.animationRefs[s] = m.colors.animateStateColor(s, m.colors.stateColors[s], duration);
+        m.animationRefs[s] = m.colors.animateStateColor(s, m.colors.stateColors[s], duration, cb);
     };
 
 
@@ -364,7 +364,7 @@ module.exports = function (m, $, d3) {
             var w = m.popupWidth * $(m.mapSelector).width();
             if (typeof(m.popupWidthFixed)!=="undefined") {
               if (m.popupWidthFixed) {
-                w = m.popupWidthFixed;
+                w = m.popupWidth;
               }
             }
             popup.css({

@@ -268,7 +268,11 @@ module.exports = (function() {
 
             //The start color is whatever color the state currently is
             if (m.stateObjs[state]) {
-                startColor = c.hexToRGB(m.stateObjs[state].attr("fill"));
+                var hexColor = m.stateObjs[state].attr("fill");
+                if (hexColor.indexOf("url")!==-1) {
+                    hexColor = m.stateObjs[state].attr("data-animfill");
+                }
+                startColor = c.hexToRGB(hexColor);
             }
 
             //If the end color is the same as the current color, don't need to do anything
@@ -286,7 +290,7 @@ module.exports = (function() {
                 r: setInterval(function () {
                     if (tracker > duration) {
                         clearInterval(theAnimation.r);
-                        finished();
+                        finished(state);
                         return false;
                     }
 
@@ -320,7 +324,7 @@ module.exports = (function() {
                 newColors: newColor,
                 stopAnimation: function () {
                     clearInterval(this.r);
-                    finished();
+                    finished(state);
                 },
 
                 /*For use in conjunction with stopAnimation, if it needs to be reset
