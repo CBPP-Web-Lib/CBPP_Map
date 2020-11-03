@@ -380,7 +380,7 @@ module.exports = function (m, $, d3) {
             } catch (ex) { }
             popup.css(horizontalAlign, "2px");
             popup.css(verticalAlign, "2px");
-            popup.html(m.popupTemplate(m.data, s));
+            popup.html(m.popupTemplate(m.data, s, e));
             //append it to the map div
             //$(m.mapSelector).append(popup_container);
             movePopup();
