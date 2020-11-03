@@ -80,7 +80,11 @@ module.exports = function (m, $, d3) {
     var hoverTimer, cursorInsidePopup = false;
 
     $(m.mapSelector).on("mouseenter", " .popup_container", function() {
-        cursorInsidePopup = true;
+        if (m.popupSticky===false) {
+            movePopup();
+        } else {
+            cursorInsidePopup = true;
+        }
     });
 
     $(m.mapSelector).on("mouseleave", " .popup_container", function() {
