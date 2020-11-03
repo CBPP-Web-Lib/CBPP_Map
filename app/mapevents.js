@@ -45,7 +45,6 @@ module.exports = function (m, $, d3) {
         if (m.customHeightSwitch) {
             height_switch = m.customHeightSwitch * m.height;
         }
-        console.log(height_switch);
         if (box_anchor[0] > m.width  / 2 + offset.left) {
             x_d = -1;
             xprop = "right";
