@@ -41,11 +41,16 @@ module.exports = function (m, $, d3) {
         var x_d = 1, y_d = 1;
         var xprop = "left";
         var yprop = "top";
-        if (box_anchor[0] > m.width / 2 + offset.left) {
+        var height_switch = m.height / 2;
+        if (m.customHeightSwitch) {
+            height_switch = m.customHeightSwitch * m.height;
+        }
+        console.log(height_switch);
+        if (box_anchor[0] > m.width  / 2 + offset.left) {
             x_d = -1;
             xprop = "right";
         }
-        if (box_anchor[1] > m.height / 2 + offset.top) {
+        if (box_anchor[1] > height_switch + offset.top) {
             y_d = -1;
             yprop = "bottom";
         }
