@@ -304,6 +304,12 @@ module.exports = function (m, $, d3) {
 
     /*Focus on the state*/
     m.focusOn = function (s, e) {
+
+        if (m.disableAllFocus) {
+            removeAllFocus();
+            return false;
+        }
+
         if (m.stateObjs[s][0] === null) {
             return false;
         }
