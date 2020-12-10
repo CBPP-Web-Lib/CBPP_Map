@@ -24,7 +24,7 @@ module.exports = function (m, $, d3) {
     m.mouseOnState = "none";
 
     var isTouch = false;
-    var popupDelay = 150;
+    var popupDelay = m.popupDelay;
     window.addEventListener('touchstart', function setHasTouch () {
         isTouch = true;
         popupDelay = 0;

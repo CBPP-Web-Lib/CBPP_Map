@@ -131,6 +131,7 @@ module.exports = function($, d3) {
 			legendLabelSize:24,
 			disableAllPopups: false,
 			brightnessThreshold: 550,
+			popupDelay:150,
 			popupTemplate: function(data, s) {
 				if (typeof(data)!=="undefined") {
 					if (typeof(data[s])!=="undefined") {
