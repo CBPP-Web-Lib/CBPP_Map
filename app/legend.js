@@ -59,17 +59,20 @@ module.exports = function ($, d3) {
 	}
 
 	function drawGradient(m, left, width, l, legendAttrs) {
+		var rand = m.legend_rand;
 		var zeroPercent;
 		var _legendLocation = legendLocation(m);
 		m.legendBox = m.paper.append("rect")
 			.attr("x",left)
 			.attr("y", legendLocation(m))
+			.attr("class","cbpp-legend-rect")
 			.attr("width", width)
 			.attr("height", 20);
 		//Fill with gradient string
-		m.paper.select("#legendGradient").remove();
+		m.paper.select(".cbpp-legend-gradient").remove();
 		m.paper.append("linearGradient")
-			.attr("id","legendGradient")
+			.attr("id","legendGradient-" + rand)
+			.attr("class","cbpp-legend-gradient")
 			.selectAll("stop")
 			.data(makeGradientData(l))
 			.enter()
@@ -82,7 +85,7 @@ module.exports = function ($, d3) {
 		//m.legendBox.attr("fill", makeGradientString(l));
 		m.legendBox.attr("stroke", m.colorConfig.borderColor);
 		m.legendBox.attr("stroke-width", m.borderWidth);
-		m.legendBox.attr("fill","url(#legendGradient)");
+		m.legendBox.attr("fill","url(#legendGradient-" + rand + ")");
 		//Make new left legend label
 		m.leftLegendText = m.paper.append("text")
 			.attr("x",left)
@@ -181,7 +184,7 @@ module.exports = function ($, d3) {
 	function replace_gradient(m) {
 		if (m.colorGen) {
 			$(m.mapSelector).parent().find(".replace-canvas").remove();
-			var rect = d3.select(m.mapSelector + " svg").selectAll('rect[fill="url(#legendGradient)"]');
+			var rect = d3.select(m.mapSelector + " svg").selectAll('rect.cbpp-legend-rect');
 			var canvas = $(document.createElement("canvas")).attr("width",500).attr("height",1).addClass("replace-canvas");
 			var ctx = canvas[0].getContext("2d");
 			var start = m.colorConfig.lowColor;
@@ -249,7 +252,7 @@ module.exports = function ($, d3) {
 
 		/*Draw the legend*/
 		draw: function (m) {
-
+			m.legend_rand = Math.round(Math.random()*1e14);
 			var legendWidth = 0.7;
 			if (typeof(m.legendWidth)!=="undefined") {
 				legendWidth = m.legendWidth;
