@@ -287,7 +287,7 @@ module.exports = function (m, $, d3) {
                     cb();
                 }
             });
-        m.paper.selectAll("path, text").filter(function() {
+        m.paper.selectAll("path, text, rect, line").filter(function() {
             return (this != m.stateObjs[m.zoomedState].node()) && m.zoomedState!=="US";
         }).attr("opacity",1)
             .transition()
