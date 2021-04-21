@@ -18,7 +18,7 @@ module.exports = function (m, $, d3) {
 
             movePopup();
             if (typeof(m.postPopupMouseMove)==="function") {
-                m.postPopupMouseMove()
+                m.postPopupMouseMove(e)
             }
         }
 
