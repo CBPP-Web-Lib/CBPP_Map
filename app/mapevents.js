@@ -17,6 +17,9 @@ module.exports = function (m, $, d3) {
         if (m.popupSticky === false && !cursorInsidePopup) {
 
             movePopup();
+            if (typeof(m.postPopupMouseMove)==="function") {
+                m.postPopupMouseMove()
+            }
         }
 
     };
